@@ -1,11 +1,33 @@
 import random
 
 
+def choose_difficulty():
+    print("\nВыбери уровень сложности:")
+    print("1. Лёгкий (1-50)")
+    print("2. Средний (1-100)")
+    print("3. Сложный (1-500)")
+
+    while True:
+        try:
+            choice = int(input("Твой выбор (1-3): "))
+            if choice == 1:
+                return 50
+            elif choice == 2:
+                return 100
+            elif choice == 3:
+                return 500
+            else:
+                print("Выбери 1, 2 или 3!")
+        except ValueError:
+            print("Пожалуйста, введи число от 1 до 3.")
+
+
 def guess_number():
-    number = random.randint(1, 100)
+    max_number = choose_difficulty()
+    number = random.randint(1, max_number)
     attempts = 0
 
-    print("Я загадал число от 1 до 100. Попробуй угадать!")
+    print(f"\nЯ загадал число от 1 до {max_number}. Попробуй угадать!")
 
     while True:
         try:
