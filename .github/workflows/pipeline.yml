@@ -55,17 +55,21 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           RESULT: ${{ needs.quality.result }}
         run: |
-          TEXT=$(printf "Pipeline: %s\nRepo: %s\nPR: #%s - %s\nBranch: %s -> %s\nRun: %s/%s/actions/runs/%s" \
-            "$RESULT" \
-            "${{ github.repository }}" \
-            "${{ github.event.pull_request.number }}" \
-            "${{ github.event.pull_request.title }}" \
-            "${{ github.head_ref }}" \
-            "${{ github.base_ref }}" \
-            "${{ github.server_url }}" \
-            "${{ github.repository }}" \
-            "${{ github.run_id }}")
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
-            -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=${TEXT}"
+  TEXT=$(printf "Pipeline: %s\nRepo: %s\nPR: #%s - %s\nBranch: %s -> %s\nRun: %s/%s/actions/runs/%s" \
+    "$RESULT" \
+    "${{ github.repository }}" \
+    "${{ github.event.pull_request.number }}" \
+    "${{ github.event.pull_request.title }}" \
+    "${{ github.head_ref }}" \
+    "${{ github.base_ref }}" \
+    "${{ github.server_url }}" \
+    "${{ github.repository }}" \
+    "${{ github.run_id }}")
+
+  RESP=$(curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+    -d "chat_id=${TELEGRAM_CHAT_ID}" \
+    --data-urlencode "text=${TEXT}")
+
+  echo "$RESP"
+  echo "$RESP" | grep -q '"ok":true' || exit 1
 
