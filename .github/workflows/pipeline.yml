@@ -1,5 +1,4 @@
 name: DevOps CI (quality + telegram)
-
 on:
   pull_request:
     branches:
