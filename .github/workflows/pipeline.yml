@@ -1,12 +1,9 @@
-name: DevOps CI (quality + telegram)
+name: CI quality + telegram
 
 on:
   pull_request:
-    branches:
-      - dev
-    types:
-      - closed
-
+    branches: ["dev"]
+    types: ["closed"]
 jobs:
   quality:
     if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'feature/ticket-')
@@ -15,10 +12,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.11"   # можешь поставить свою версию
 
       - name: Install flake8
         run: |
@@ -44,13 +41,12 @@ jobs:
       - name: Fail if flake8 found issues
         if: steps.flake8.outputs.exit_code != '0'
         run: exit 1
-
   telegram_notify:
     needs: quality
     if: always() && github.event.pull_request.merged == true && startsWith(github.head_ref, 'feature/ticket-')
     runs-on: ubuntu-latest
     steps:
-      - name: Send Telegram notification
+      - name: Send Telegram message
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -66,7 +62,11 @@ jobs:
             "${{ github.server_url }}" \
             "${{ github.repository }}" \
             "${{ github.run_id }}")
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+
+          RESP=$(curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=${TEXT}"
+            --data-urlencode "text=${TEXT}")
+
+          echo "$RESP"
+          echo "$RESP" | grep -q '"ok":true' || exit 1
 
