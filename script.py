@@ -1,6 +1,5 @@
 import random
 
-
 def choose_difficulty():
     print("\nВыбери уровень сложности:")
     print("1. Лёгкий (1-50)")
