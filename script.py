@@ -51,4 +51,5 @@ def guess_number():
 
 
 if __name__ == "__main__":
+    print("Игра «Угадай число» запущена.")
     guess_number()
